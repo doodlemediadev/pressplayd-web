@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Privacy Policy — pressplayd</title>
+<meta name="description" content="How pressplayd collects, uses and protects your personal data."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0a0a0c;
+  --ink2:#1c1c22;
+  --paper:#f7f6f2;
+  --paper2:#e8e7e2;
+  --muted:rgba(247,246,242,0.45);
+  --dim:rgba(247,246,242,0.2);
+  --border:rgba(255,255,255,0.07);
+  --c-film:#e8b84b;
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);
+  color:var(--paper);
+  font-family:'DM Sans',sans-serif;
+  font-size:17px;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  height:56px;display:flex;align-items:center;
+  padding:0 40px;
+  background:rgba(10,10,12,0.85);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+}
+.nav-inner{
+  width:100%;max-width:1200px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo img{width:26px;height:26px}
+.nav-wordmark{font-family:'DM Serif Display',serif;font-size:18px;color:var(--paper);letter-spacing:-.02em}
+.nav-back{font-size:14px;color:var(--muted);text-decoration:none;transition:color .15s}
+.nav-back:hover{color:var(--paper)}
+
+/* LAYOUT */
+.page{
+  max-width:680px;
+  margin:0 auto;
+  padding:120px 24px 100px;
+}
+
+/* HEADER */
+.doc-eyebrow{
+  font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--c-film);margin-bottom:16px;display:block;
+}
+.doc-title{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(40px,6vw,60px);
+  line-height:1.05;letter-spacing:-.035em;
+  color:var(--paper);margin-bottom:16px;
+}
+.doc-meta{
+  font-size:14px;color:var(--muted);
+  padding-bottom:40px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:56px;
+}
+
+/* BODY */
+.doc-section{margin-bottom:52px}
+.doc-section h2{
+  font-family:'DM Serif Display',serif;
+  font-size:24px;letter-spacing:-.02em;
+  color:var(--paper);margin-bottom:14px;
+  line-height:1.2;
+}
+.doc-section p{
+  color:var(--muted);font-size:16px;font-weight:300;
+  line-height:1.75;margin-bottom:14px;
+}
+.doc-section p:last-child{margin-bottom:0}
+.doc-section ul{
+  list-style:none;padding:0;margin:14px 0;
+}
+.doc-section ul li{
+  color:var(--muted);font-size:16px;font-weight:300;
+  line-height:1.75;padding-left:20px;position:relative;
+  margin-bottom:8px;
+}
+.doc-section ul li::before{
+  content:'—';position:absolute;left:0;
+  color:var(--dim);font-size:14px;
+}
+.doc-section a{color:var(--paper);text-underline-offset:3px}
+.doc-section a:hover{color:var(--c-film)}
+
+.doc-divider{
+  height:1px;background:var(--border);
+  margin:52px 0;
+}
+
+/* HIGHLIGHT BOX */
+.doc-callout{
+  background:var(--ink2);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:24px 28px;
+  margin:24px 0;
+}
+.doc-callout p{margin-bottom:0}
+
+/* FOOTER */
+footer{
+  border-top:1px solid var(--border);
+  padding:32px 24px;
+}
+.footer-inner{
+  max-width:1200px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:16px;
+}
+.footer-logo{
+  display:flex;align-items:center;gap:8px;text-decoration:none;
+  font-family:'DM Serif Display',serif;font-size:15px;
+  color:rgba(247,246,242,.45);letter-spacing:-.01em;
+}
+.footer-logo img{width:18px;height:18px}
+.footer-links{display:flex;gap:20px}
+.footer-links a{font-size:13px;color:var(--dim);text-decoration:none;transition:color .15s}
+.footer-links a:hover{color:var(--muted)}
+.footer-copy{font-size:13px;color:rgba(247,246,242,.15)}
+
+@media(max-width:600px){
+  nav{padding:0 20px}
+  .page{padding:96px 20px 80px}
+  .doc-title{font-size:clamp(36px,10vw,52px)}
+  .doc-callout{padding:18px 20px}
+  footer{padding:24px 20px}
+  .footer-inner{flex-direction:column;align-items:flex-start;gap:16px}
+  .footer-copy{display:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <img src="Disc.png" alt="pressplayd"/>
+      <span class="nav-wordmark">pressplayd</span>
+    </a>
+    <a href="/" class="nav-back">← Back</a>
+  </div>
+</nav>
+
+<main class="page">
+  <span class="doc-eyebrow">Legal</span>
+  <h1 class="doc-title">Privacy Policy</h1>
+  <p class="doc-meta">Last updated: 1 January 2025 &nbsp;·&nbsp; Applies to pressplayd iOS &amp; Android apps and pressplayd.com</p>
+
+  <div class="doc-callout">
+    <p>We've written this in plain English. If you have questions about anything here, email us at <a href="mailto:hello@pressplayd.com">hello@pressplayd.com</a> and we'll answer properly.</p>
+  </div>
+
+  <div class="doc-section">
+    <h2>Who we are</h2>
+    <p>pressplayd is operated as a personal project based in Ireland. When this policy says "we", "us" or "our", it means the developer of pressplayd.</p>
+    <p>For the purposes of EU and Irish data protection law (GDPR), we are the data controller of any personal information you provide to us.</p>
+    <p>Contact: <a href="mailto:hello@pressplayd.com">hello@pressplayd.com</a></p>
+  </div>
+
+  <div class="doc-divider"></div>
+
+  <div class="doc-section">
+    <h2>What data we collect</h2>
+    <p>We only collect what we need to run the app. Here's exactly what that is:</p>
+    <ul>
+      <li><strong style="color:var(--paper);font-weight:500">Account information</strong> — your email address and password when you sign up. If you choose to add them: a display name, username, bio, and location.</li>
+      <li><strong style="color:var(--paper);font-weight:500">Content you create</strong> — the media logs, ratings, reviews, lists and comments you post in the app.</li>
+      <li><strong style="color:var(--paper);font-weight:500">Social data</strong> — who you follow and who follows you.</li>
+      <li><strong style="color:var(--paper);font-weight:500">Push notification token</strong> — a device identifier used to send you push notifications. Only collected if you grant permission.</li>
+      <li><strong style="color:var(--paper);font-weight:500">Category preferences</strong> — the media types you select during onboarding.</li>
+    </ul>
+    <p>We do not collect your precise location, payment information, or any other sensitive personal data.</p>
+  </div>
+
+  <div class="doc-divider"></div>
+
+  <div class="doc-section">
+    <h2>How we use your data</h2>
+    <p>We use the data listed above for the following purposes:</p>
+    <ul>
+      <li>To create and maintain your account</li>
+      <li>To show your logs, reviews and lists to you and (if public) to other users</li>
+      <li>To power the social feed — showing you what people you follow have logged</li>
+      <li>To send you push notifications about likes, comments and follows (only if you enable them)</li>
+      <li>To display follow suggestions to new users during onboarding</li>
+      <li>To respond to support requests you send us</li>
+    </ul>
+    <p>We do not use your data for advertising, and we do not sell it to third parties. Ever.</p>
+  </div>
+
+  <div class="doc-divider"></div>
+
+  <div class="doc-section">
+    <h2>Legal basis for processing (GDPR)</h2>
+    <p>Under GDPR, we need a legal basis for processing your personal data. Ours are:</p>
+    <ul>
+      <li><strong style="color:var(--paper);font-weight:500">Contract</strong> — processing your account data is necessary to provide the service you signed up for.</li>
+      <li><strong style="color:var(--paper);font-weight:500">Legitimate interests</strong> — operating, improving and securing the app.</li>
+      <li><strong style="color:var(--paper);font-weight:500">Consent</strong> — for push notifications, which you can withdraw at any time in your device settings.</li>
+    </ul>
+  </div>
+
+  <div class="doc-divider"></div>
+
+  <div class="doc-section">
+    <h2>Where your data is stored</h2>
+    <p>Your data is stored using <a href="https://supabase.com" target="_blank" rel="noopener">Supabase</a>, a cloud database platform. Supabase stores data on AWS infrastructure. The primary region for our database is EU West (Ireland), meaning your data stays within the EU.</p>
+    <p>Supabase's privacy policy is available at <a href="https://supabase.com/privacy" target="_blank" rel="noopener">supabase.com/privacy</a>.</p>
+  </div>
+
+  <div class="doc-divider"></div>
+
+  <div class="doc-section">
+    <h2>Third-party services</h2>
+    <p>pressplayd uses the following third-party services to function. Each has its own privacy policy.</p>
+    <ul>
+      <li><strong style="color:var(--paper);font-weight:500">Supabase</strong> — database, authentication and file storage</li>
+      <li><strong style="color:var(--paper);font-weight:500">TMDB (The Movie Database)</strong> — film and TV show metadata. No personal data is shared with TMDB.</li>
+      <li><strong style="color:var(--paper);font-weight:500">iTunes Search API (Apple)</strong> — music and album metadata. No personal data is shared.</li>
+      <li><strong style="color:var(--paper);font-weight:500">OpenLibrary</strong> — book metadata. No personal data is shared.</li>
+      <li><strong style="color:var(--paper);font-weight:500">RAWG</strong> — game metadata. No personal data is shared.</li>
+      <li><strong style="color:var(--paper);font-weight:500">Expo Push Notifications</strong> — for delivering push notifications to your device.</li>
+    </ul>
+  </div>
+
+  <div class="doc-divider"></div>
+
+  <div class="doc-section">
+    <h2>Your rights under GDPR</h2>
+    <p>As someone based in the EU, or using a service operated from the EU, you have the following rights:</p>
+    <ul>
+      <li><strong style="color:var(--paper);font-weight:500">Access</strong> — you can request a copy of the personal data we hold about you.</li>
+      <li><strong style="color:var(--paper);font-weight:500">Correction</strong> — you can update your profile information at any time from within the app.</li>
+      <li><strong style="color:var(--paper);font-weight:500">Deletion</strong> — you can delete your account and all associated data from within the app, or by emailing us. We will action deletion requests within 30 days.</li>
+      <li><strong style="color:var(--paper);font-weight:500">Portability</strong> — you can request an export of your data in a machine-readable format.</li>
+      <li><strong style="color:var(--paper);font-weight:500">Objection</strong> — you can object to processing based on legitimate interests.</li>
+      <li><strong style="color:var(--paper);font-weight:500">Withdraw consent</strong> — you can turn off push notifications at any time in your device settings.</li>
+    </ul>
+    <p>To exercise any of these rights, email <a href="mailto:hello@pressplayd.com">hello@pressplayd.com</a>. You also have the right to lodge a complaint with the Data Protection Commission (Ireland) at <a href="https://www.dataprotection.ie" target="_blank" rel="noopener">dataprotection.ie</a>.</p>
+  </div>
+
+  <div class="doc-divider"></div>
+
+  <div class="doc-section">
+    <h2>Age requirement</h2>
+    <p>pressplayd is intended for users aged 16 and over. We do not knowingly collect personal data from anyone under 16. If you believe a person under 16 has created an account, please contact us at <a href="mailto:hello@pressplayd.com">hello@pressplayd.com</a> and we will delete the account promptly.</p>
+  </div>
+
+  <div class="doc-divider"></div>
+
+  <div class="doc-section">
+    <h2>Data retention</h2>
+    <p>We keep your data for as long as your account is active. If you delete your account, we will delete your personal data within 30 days, except where we are required to retain it for legal reasons.</p>
+    <p>Anonymised or aggregated data (e.g. total log counts) may be retained indefinitely as it cannot identify you.</p>
+  </div>
+
+  <div class="doc-divider"></div>
+
+  <div class="doc-section">
+    <h2>Changes to this policy</h2>
+    <p>If we make material changes to this policy, we'll notify you via the app or by email before the changes take effect. The "last updated" date at the top of this page will always reflect the most recent version.</p>
+  </div>
+
+  <div class="doc-divider"></div>
+
+  <div class="doc-section">
+    <h2>Contact</h2>
+    <p>If you have any questions about this policy or how we handle your data, email us at <a href="mailto:hello@pressplayd.com">hello@pressplayd.com</a>. We'll respond within a few days.</p>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <a href="/" class="footer-logo">
+      <img src="Disc.png" alt="pressplayd"/>
+      pressplayd
+    </a>
+    <div class="footer-links">
+      <a href="/privacy.html">Privacy</a>
+      <a href="/terms.html">Terms</a>
+      <a href="mailto:hello@pressplayd.com">Contact</a>
+    </div>
+    <div class="footer-copy">&copy; 2025 pressplayd</div>
+  </div>
+</footer>
+
+</body>
+</html>
