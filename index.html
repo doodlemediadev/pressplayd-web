@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>pressplayd — Track Everything You Love</title>
+<meta name="description" content="Track films, TV, music, books and games. Rate, review and share with friends. Your entire media life in one place." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #09090f;
+    --card: #111119;
+    --input: #18182a;
+    --gold: #e8c97d;
+    --gold-dim: #c9a85a;
+    --gold-glow: rgba(232, 201, 125, 0.12);
+    --gold-glow-strong: rgba(232, 201, 125, 0.22);
+    --muted: #8887a8;
+    --dim: #44445a;
+    --light: #eeeef8;
+    --film: #e8c97d;
+    --tv: #7de8c9;
+    --music: #c97de8;
+    --book: #e87d7d;
+    --game: #7db5e8;
+    --orange: #ff8939;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--light);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.6;
+  }
+
+  /* ── AMBIENT GLOW ── */
+  .ambient {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .ambient-1 {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(232,201,125,0.07) 0%, transparent 70%);
+    top: -200px; left: 50%;
+    transform: translateX(-50%);
+  }
+  .ambient-2 {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(201,125,232,0.06) 0%, transparent 70%);
+    top: 40%; right: -100px;
+  }
+  .ambient-3 {
+    width: 350px; height: 350px;
+    background: radial-gradient(circle, rgba(125,181,232,0.05) 0%, transparent 70%);
+    top: 60%; left: -80px;
+  }
+
+  /* ── LAYOUT ── */
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 0 24px;
+    background: rgba(9,9,15,0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .nav-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+  }
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+  .nav-logo-icon {
+    width: 32px; height: 32px;
+  }
+  .nav-logo-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--light);
+    letter-spacing: -0.01em;
+  }
+  .nav-cta {
+    background: var(--gold);
+    color: #09090f;
+    border: none;
+    border-radius: 999px;
+    padding: 8px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+    display: inline-block;
+  }
+  .nav-cta:hover { background: #f0d899; transform: translateY(-1px); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 24px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(232,201,125,0.1);
+    border: 1px solid rgba(232,201,125,0.25);
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--gold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.1s forwards;
+  }
+  .hero-badge-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .hero-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(52px, 8vw, 96px);
+    line-height: 1.0;
+    letter-spacing: -0.03em;
+    color: var(--light);
+    margin-bottom: 12px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .hero-sub {
+    font-size: clamp(16px, 2.5vw, 20px);
+    color: var(--muted);
+    max-width: 520px;
+    font-weight: 300;
+    margin-bottom: 48px;
+    line-height: 1.6;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.35s forwards;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.5s forwards;
+    margin-bottom: 80px;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--gold);
+    color: #09090f;
+    border: none;
+    border-radius: 999px;
+    padding: 14px 28px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  }
+  .btn-primary:hover {
+    background: #f0d899;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(232,201,125,0.3);
+  }
+  .btn-primary svg { width: 18px; height: 18px; }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    color: var(--light);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 999px;
+    padding: 14px 28px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 0.2s, transform 0.15s, background 0.2s;
+  }
+  .btn-secondary:hover {
+    border-color: rgba(255,255,255,0.35);
+    background: rgba(255,255,255,0.04);
+    transform: translateY(-2px);
+  }
+
+  /* ── MEDIA TYPE BADGES ── */
+  .hero-types {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.65s forwards;
+  }
+  .type-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+  .type-badge span.dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+  }
+  .type-badge.film .dot { background: var(--film); }
+  .type-badge.tv .dot { background: var(--tv); }
+  .type-badge.music .dot { background: var(--music); }
+  .type-badge.book .dot { background: var(--book); }
+  .type-badge.game .dot { background: var(--game); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── SCROLL INDICATOR ── */
+  .scroll-hint {
+    position: absolute;
+    bottom: 36px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: var(--dim);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeUp 0.8s 1.2s forwards;
+  }
+  .scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--dim), transparent);
+    animation: scrollPulse 2s infinite;
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  /* ── SECTION ── */
+  section {
+    position: relative;
+    z-index: 1;
+    padding: 100px 0;
+  }
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(36px, 5vw, 56px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--light);
+    margin-bottom: 20px;
+  }
+  .section-title em { font-style: italic; color: var(--gold); }
+  .section-desc {
+    font-size: 18px;
+    color: var(--muted);
+    font-weight: 300;
+    max-width: 560px;
+    line-height: 1.7;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    position: relative;
+    z-index: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.07), transparent);
+    margin: 0 24px;
+  }
+
+  /* ── FEATURE CARDS ── */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 24px;
+    overflow: hidden;
+    margin-top: 60px;
+  }
+  .feature-card {
+    background: var(--bg);
+    padding: 40px 36px;
+    position: relative;
+    transition: background 0.25s;
+  }
+  .feature-card:hover { background: #0e0e18; }
+  .feature-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: 20px;
+    background: rgba(232,201,125,0.1);
+  }
+  .feature-card h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--light);
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+  }
+  .feature-card p {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  /* ── STATS STRIP ── */
+  .stats-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 20px;
+    overflow: hidden;
+    margin: 60px 0;
+  }
+  .stat-cell {
+    background: var(--card);
+    padding: 36px 28px;
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 40px;
+    color: var(--gold);
+    letter-spacing: -0.02em;
+    display: block;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .stat-label {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  /* ── LOG EXAMPLES ── */
+  .logs-showcase {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 60px;
+  }
+  .log-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 16px 20px;
+    transition: border-color 0.2s, transform 0.2s;
+    animation: slideIn 0.5s both;
+  }
+  .log-row:hover {
+    border-color: rgba(232,201,125,0.2);
+    transform: translateX(4px);
+  }
+  .log-row:nth-child(1) { animation-delay: 0.1s; }
+  .log-row:nth-child(2) { animation-delay: 0.2s; }
+  .log-row:nth-child(3) { animation-delay: 0.3s; }
+  .log-row:nth-child(4) { animation-delay: 0.4s; }
+  .log-row:nth-child(5) { animation-delay: 0.5s; }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-16px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .log-poster {
+    width: 44px; height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+  }
+  .log-info { flex: 1; min-width: 0; }
+  .log-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--light);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 3px;
+  }
+  .log-meta {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .log-type-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .log-rating {
+    font-size: 13px;
+    color: var(--gold);
+    font-weight: 500;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+  }
+  .log-badge {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+
+  /* ── SOCIAL SECTION ── */
+  .social-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 60px;
+  }
+  .social-card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 20px;
+    padding: 28px;
+    transition: border-color 0.2s;
+  }
+  .social-card:hover { border-color: rgba(232,201,125,0.2); }
+  .social-card.tall { grid-row: span 2; }
+  .social-card h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--light);
+    margin-bottom: 8px;
+  }
+  .social-card p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+  .social-icon {
+    font-size: 28px;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  /* ── MEDIA TYPES SECTION ── */
+  .media-types {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-top: 60px;
+  }
+  .media-type-card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 24px 16px;
+    text-align: center;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .media-type-card:hover {
+    transform: translateY(-4px);
+  }
+  .media-type-card.film:hover { border-color: var(--film); }
+  .media-type-card.tv:hover { border-color: var(--tv); }
+  .media-type-card.music:hover { border-color: var(--music); }
+  .media-type-card.book:hover { border-color: var(--book); }
+  .media-type-card.game:hover { border-color: var(--game); }
+  .media-type-emoji { font-size: 32px; display: block; margin-bottom: 10px; }
+  .media-type-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--light);
+    margin-bottom: 4px;
+  }
+  .media-type-source {
+    font-size: 11px;
+    color: var(--dim);
+  }
+  .media-type-bar {
+    width: 28px; height: 3px;
+    border-radius: 999px;
+    margin: 10px auto 0;
+  }
+  .film .media-type-bar { background: var(--film); }
+  .tv .media-type-bar { background: var(--tv); }
+  .music .media-type-bar { background: var(--music); }
+  .book .media-type-bar { background: var(--book); }
+  .game .media-type-bar { background: var(--game); }
+
+  /* ── QUOTE ── */
+  .quote-section {
+    text-align: center;
+    padding: 80px 0;
+  }
+  .quote-mark {
+    font-family: 'DM Serif Display', serif;
+    font-size: 80px;
+    color: var(--gold);
+    line-height: 0.5;
+    opacity: 0.4;
+    display: block;
+    margin-bottom: 20px;
+  }
+  blockquote {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(24px, 4vw, 38px);
+    font-style: italic;
+    color: var(--light);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    max-width: 700px;
+    margin: 0 auto 20px;
+  }
+  blockquote em { color: var(--gold); font-style: normal; }
+
+  /* ── WAITLIST / CTA SECTION ── */
+  .cta-section {
+    padding: 100px 0 120px;
+    text-align: center;
+  }
+  .cta-box {
+    background: var(--card);
+    border: 1px solid rgba(232,201,125,0.15);
+    border-radius: 28px;
+    padding: 64px 48px;
+    max-width: 600px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-box::before {
+    content: '';
+    position: absolute;
+    top: -1px; left: 50%; transform: translateX(-50%);
+    width: 60%; height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+  }
+  .cta-box h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 40px;
+    letter-spacing: -0.02em;
+    color: var(--light);
+    margin-bottom: 12px;
+    line-height: 1.1;
+  }
+  .cta-box p {
+    color: var(--muted);
+    font-size: 16px;
+    font-weight: 300;
+    margin-bottom: 32px;
+    line-height: 1.6;
+  }
+  .email-form {
+    display: flex;
+    gap: 8px;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  .email-input {
+    flex: 1;
+    background: var(--input);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 999px;
+    padding: 12px 20px;
+    color: var(--light);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .email-input::placeholder { color: var(--dim); }
+  .email-input:focus { border-color: rgba(232,201,125,0.4); }
+  .email-submit {
+    background: var(--gold);
+    color: #09090f;
+    border: none;
+    border-radius: 999px;
+    padding: 12px 22px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .email-submit:hover { background: #f0d899; transform: translateY(-1px); }
+  .cta-note {
+    font-size: 13px;
+    color: var(--dim);
+    margin-top: 16px;
+  }
+  .success-msg {
+    display: none;
+    color: var(--tv);
+    font-size: 15px;
+    font-weight: 500;
+    margin-top: 16px;
+  }
+
+  /* ── STORE BADGES ── */
+  .store-badges {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 32px;
+    flex-wrap: wrap;
+  }
+  .store-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 10px 18px;
+    text-decoration: none;
+    color: var(--light);
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .store-badge:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.2);
+  }
+  .store-badge-icon { font-size: 22px; }
+  .store-badge-text small { display: block; font-size: 10px; color: var(--muted); }
+  .store-badge-text strong { display: block; font-size: 14px; font-weight: 600; }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding: 40px 24px;
+  }
+  .footer-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .footer-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--light);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+  .footer-links {
+    display: flex;
+    gap: 24px;
+  }
+  .footer-links a {
+    font-size: 13px;
+    color: var(--dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--muted); }
+  .footer-copy {
+    font-size: 13px;
+    color: var(--dim);
+  }
+
+  /* ── VINYL LOGO SVG ── */
+  .vinyl-logo {
+    display: inline-block;
+  }
+
+  /* ── STAR RATING ── */
+  .stars { color: var(--gold); font-size: 13px; letter-spacing: 1px; }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .stats-strip { grid-template-columns: repeat(2, 1fr); }
+    .social-grid { grid-template-columns: 1fr; }
+    .social-card.tall { grid-row: span 1; }
+    .media-types { grid-template-columns: repeat(3, 1fr); }
+    .features-grid { grid-template-columns: 1fr; }
+    .email-form { flex-direction: column; }
+    .cta-box { padding: 40px 24px; }
+    nav .nav-cta { display: none; }
+  }
+  @media (max-width: 480px) {
+    .media-types { grid-template-columns: repeat(2, 1fr); }
+    .hero-types { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Ambient glows -->
+<div class="ambient ambient-1"></div>
+<div class="ambient ambient-2"></div>
+<div class="ambient ambient-3"></div>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <img src="Disc.png" class="nav-logo-icon" alt="pressplayd logo" />
+      <span class="nav-logo-text">pressplayd</span>
+    </a>
+    <a href="#waitlist" class="nav-cta">Get Early Access</a>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="container" style="display:flex;flex-direction:column;align-items:center;">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      Now in Beta
+    </div>
+
+    <img src="Disc.png" alt="pressplayd" style="width:100px;height:100px;margin-bottom:28px;opacity:0;animation:fadeUp 0.8s 0.15s forwards;filter:drop-shadow(0 0 40px rgba(100,200,240,0.3));" />
+
+    <h1 class="hero-title">
+      Your life in<br><em>film, music & more</em>
+    </h1>
+
+    <p class="hero-sub">
+      Track everything you watch, listen to, read and play. Rate it, review it, and share your taste with friends.
+    </p>
+
+    <div class="hero-actions">
+      <a href="#waitlist" class="btn-primary">
+        <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="9" cy="9" r="8.25" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M7 6l5 3-5 3V6z" fill="currentColor"/>
+        </svg>
+        Get Early Access
+      </a>
+      <a href="#features" class="btn-secondary">See how it works ↓</a>
+    </div>
+
+    <div class="hero-types">
+      <div class="type-badge film"><span class="dot"></span> Films</div>
+      <div class="type-badge tv"><span class="dot"></span> TV Shows</div>
+      <div class="type-badge music"><span class="dot"></span> Music</div>
+      <div class="type-badge book"><span class="dot"></span> Books</div>
+      <div class="type-badge game"><span class="dot"></span> Games</div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    Scroll
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── STATS ── -->
+<section id="features">
+  <div class="container">
+    <div class="stats-strip reveal">
+      <div class="stat-cell">
+        <span class="stat-num">5</span>
+        <span class="stat-label">Media types</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-num">½★</span>
+        <span class="stat-label">Half-star ratings</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-num">∞</span>
+        <span class="stat-label">Lists to build</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-num">1</span>
+        <span class="stat-label">App for everything</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── LOG SECTION ── -->
+<section>
+  <div class="container" style="display:grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;">
+    <div class="reveal">
+      <p class="section-label">Log &amp; Rate</p>
+      <h2 class="section-title">Keep a diary of <em>everything</em></h2>
+      <p class="section-desc">Log what you're watching, listening to, reading and playing. Rate with half-stars, write reviews, mark things as in progress, completed or dropped.</p>
+    </div>
+    <div class="logs-showcase reveal reveal-delay-2">
+      <div class="log-row">
+        <div class="log-poster" style="background:#1c1a2a; font-size:26px;">🎬</div>
+        <div class="log-info">
+          <div class="log-title">Dune: Part Two</div>
+          <div class="log-meta"><span class="log-type-dot" style="background:var(--film)"></span>Film · Denis Villeneuve</div>
+        </div>
+        <div class="log-rating">★★★★½</div>
+      </div>
+      <div class="log-row">
+        <div class="log-poster" style="background:#1a2420; font-size:26px;">📺</div>
+        <div class="log-info">
+          <div class="log-title">The Bear</div>
+          <div class="log-meta"><span class="log-type-dot" style="background:var(--tv)"></span>TV Show · FX</div>
+        </div>
+        <div class="log-rating">★★★★★</div>
+      </div>
+      <div class="log-row">
+        <div class="log-poster" style="background:#221a2a; font-size:26px;">🎵</div>
+        <div class="log-info">
+          <div class="log-title">Short n' Sweet</div>
+          <div class="log-meta"><span class="log-type-dot" style="background:var(--music)"></span>Album · Sabrina Carpenter</div>
+        </div>
+        <div class="log-rating">★★★★</div>
+      </div>
+      <div class="log-row">
+        <div class="log-poster" style="background:#2a1a1a; font-size:26px;">📖</div>
+        <div class="log-info">
+          <div class="log-title">Normal People</div>
+          <div class="log-meta"><span class="log-type-dot" style="background:var(--book)"></span>Book · Sally Rooney</div>
+        </div>
+        <div class="log-rating">★★★★½</div>
+      </div>
+      <div class="log-row">
+        <div class="log-poster" style="background:#1a1e2a; font-size:26px;">🎮</div>
+        <div class="log-info">
+          <div class="log-title">Hollow Knight</div>
+          <div class="log-meta"><span class="log-type-dot" style="background:var(--game)"></span>Game · Team Cherry</div>
+        </div>
+        <div class="log-rating">★★★★★</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── FEATURES GRID ── -->
+<section>
+  <div class="container">
+    <div class="reveal" style="text-align:center; max-width:560px; margin: 0 auto 0;">
+      <p class="section-label">Features</p>
+      <h2 class="section-title">Everything you need,<br>nothing you don't</h2>
+    </div>
+    <div class="features-grid reveal">
+      <div class="feature-card">
+        <div class="feature-icon">📅</div>
+        <h3>Diary View</h3>
+        <p>A beautiful calendar view of everything you've logged. Tap any day to see what you consumed that day.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📋</div>
+        <h3>Ranked Lists</h3>
+        <p>Build public or private ranked and unranked lists. Your top albums of the decade. Best films of 2024. All yours.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔖</div>
+        <h3>Watchlist</h3>
+        <p>Save anything to your watchlist and it stays neatly tucked away — separate from your diary until you actually log it.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌍</div>
+        <h3>Discover</h3>
+        <p>See what's trending on Press Play. Browse popular films, albums, books and games being logged by the community.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Stats</h3>
+        <p>Monthly recaps, year in review, genre breakdowns and average ratings. Understand your taste at a glance.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔔</div>
+        <h3>Notifications</h3>
+        <p>Get notified when someone likes your review, comments on your log, or follows you. Stay in the loop.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── SOCIAL ── -->
+<section>
+  <div class="container" style="display:grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;">
+    <div class="social-grid reveal">
+      <div class="social-card tall">
+        <span class="social-icon">👥</span>
+        <h4>Follow Friends</h4>
+        <p>See a real-time feed of everything your friends are logging. React, comment, and discover what they love.</p>
+        <div style="margin-top:20px; display:flex; flex-direction:column; gap:10px;">
+          <div style="display:flex; align-items:center; gap:10px; background:var(--input); border-radius:12px; padding:10px 14px;">
+            <div style="width:32px; height:32px; border-radius:50%; background: rgba(232,201,125,0.15); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0;">S</div>
+            <div>
+              <div style="font-size:13px; font-weight:500; color:var(--light);">sarah logged <span style="color:var(--film);">Challengers</span></div>
+              <div class="stars">★★★★½</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; background:var(--input); border-radius:12px; padding:10px 14px;">
+            <div style="width:32px; height:32px; border-radius:50%; background: rgba(201,125,232,0.15); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0;">M</div>
+            <div>
+      <div style="font-size:13px; font-weight:500; color:var(--light);">mike logged <span style="color:var(--music);">Brat</span></div>
+              <div class="stars">★★★★★</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; background:var(--input); border-radius:12px; padding:10px 14px;">
+            <div style="width:32px; height:32px; border-radius:50%; background: rgba(125,181,232,0.15); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0;">J</div>
+            <div>
+              <div style="font-size:13px; font-weight:500; color:var(--light);">jamie logged <span style="color:var(--game);">Balatro</span></div>
+              <div class="stars">★★★★½</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="social-card">
+        <span class="social-icon">❤️</span>
+        <h4>Likes & Comments</h4>
+        <p>React to friends' logs and leave comments on reviews.</p>
+      </div>
+      <div class="social-card">
+        <span class="social-icon">🎯</span>
+        <h4>Shared Taste</h4>
+        <p>See how your taste overlaps with the people you follow.</p>
+      </div>
+    </div>
+    <div class="reveal reveal-delay-1">
+      <p class="section-label">Social</p>
+      <h2 class="section-title">Share your <em>taste</em></h2>
+      <p class="section-desc">Follow friends and see a real-time feed of what they're watching, reading, and playing. Like reviews, leave comments, and discover your next obsession through the people you trust.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── MEDIA TYPES ── -->
+<section>
+  <div class="container">
+    <div class="reveal" style="text-align:center; max-width:560px; margin: 0 auto;">
+      <p class="section-label">Powered By</p>
+      <h2 class="section-title">Every medium,<br><em>one app</em></h2>
+      <p class="section-desc" style="margin: 0 auto;">Pulling real data from the best APIs so your logs always look gorgeous.</p>
+    </div>
+    <div class="media-types reveal" style="margin-top:48px;">
+      <div class="media-type-card film">
+        <span class="media-type-emoji">🎬</span>
+        <div class="media-type-name">Films</div>
+        <div class="media-type-source">via TMDB</div>
+        <div class="media-type-bar"></div>
+      </div>
+      <div class="media-type-card tv">
+        <span class="media-type-emoji">📺</span>
+        <div class="media-type-name">TV Shows</div>
+        <div class="media-type-source">via TMDB</div>
+        <div class="media-type-bar"></div>
+      </div>
+      <div class="media-type-card music">
+        <span class="media-type-emoji">🎵</span>
+        <div class="media-type-name">Music</div>
+        <div class="media-type-source">via iTunes</div>
+        <div class="media-type-bar"></div>
+      </div>
+      <div class="media-type-card book">
+        <span class="media-type-emoji">📖</span>
+        <div class="media-type-name">Books</div>
+        <div class="media-type-source">via OpenLibrary</div>
+        <div class="media-type-bar"></div>
+      </div>
+      <div class="media-type-card game">
+        <span class="media-type-emoji">🎮</span>
+        <div class="media-type-name">Games</div>
+        <div class="media-type-source">via RAWG</div>
+        <div class="media-type-bar"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── QUOTE ── -->
+<section class="quote-section">
+  <div class="container reveal">
+    <span class="quote-mark">&ldquo;</span>
+    <blockquote>
+      Like Letterboxd, but for <em>everything</em> you love.
+    </blockquote>
+    <p style="color: var(--dim); font-size: 14px; margin-top: 12px;">— The idea behind pressplayd</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── CTA ── -->
+<section class="cta-section" id="waitlist">
+  <div class="container">
+    <div class="cta-box reveal">
+      <h2>Be the first<br>to pressplayd</h2>
+      <p>Join the waitlist and we'll let you know when the app is ready for download.</p>
+      <div class="email-form">
+        <input
+          type="email"
+          class="email-input"
+          placeholder="your@email.com"
+          id="emailInput"
+        />
+        <button class="email-submit" onclick="handleSignup()">Join</button>
+      </div>
+      <p class="cta-note">No spam. Just one email when we launch.</p>
+      <p class="success-msg" id="successMsg">🎉 You're on the list!</p>
+      <div class="store-badges">
+        <a href="#" class="store-badge">
+          <span class="store-badge-icon">🍎</span>
+          <div class="store-badge-text">
+            <small>Coming soon on</small>
+            <strong>App Store</strong>
+          </div>
+        </a>
+        <a href="#" class="store-badge">
+          <span class="store-badge-icon">🤖</span>
+          <div class="store-badge-text">
+            <small>Coming soon on</small>
+            <strong>Google Play</strong>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-inner">
+    <a href="#" class="footer-logo">
+      <img src="Disc.png" alt="pressplayd" style="width:22px;height:22px;" />
+      pressplayd
+    </a>
+    <div class="footer-links">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="mailto:hello@pressplayd.com">Contact</a>
+    </div>
+    <div class="footer-copy">© 2025 pressplayd</div>
+  </div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(el => {
+      if (el.isIntersecting) {
+        el.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Email signup
+  function handleSignup() {
+    const input = document.getElementById('emailInput');
+    const msg = document.getElementById('successMsg');
+    if (!input.value || !input.value.includes('@')) {
+      input.style.borderColor = 'rgba(232, 125, 125, 0.5)';
+      setTimeout(() => input.style.borderColor = '', 1200);
+      return;
+    }
+    input.style.display = 'none';
+    document.querySelector('.email-submit').style.display = 'none';
+    msg.style.display = 'block';
+    document.querySelector('.cta-note').style.display = 'none';
+  }
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const id = a.getAttribute('href').slice(1);
+      if (!id) return;
+      const el = document.getElementById(id);
+      if (el) {
+        e.preventDefault();
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
+</body>
+</html>
