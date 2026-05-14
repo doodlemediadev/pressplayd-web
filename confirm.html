@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Email Confirmed — pressplayd</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #09090f;
+      --card:      #111119;
+      --input:     #18182a;
+      --gold:      #e8c97d;
+      --muted:     #8887a8;
+      --dim:       #44445a;
+      --light:     #eeeef8;
+      --orange:    #ff8939;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--light);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      overflow: hidden;
+    }
+
+    /* Ambient glow blobs */
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.15;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .blob-1 {
+      width: 500px; height: 500px;
+      background: var(--orange);
+      top: -150px; left: -150px;
+      animation: drift1 12s ease-in-out infinite alternate;
+    }
+    .blob-2 {
+      width: 400px; height: 400px;
+      background: var(--gold);
+      bottom: -100px; right: -100px;
+      animation: drift2 14s ease-in-out infinite alternate;
+    }
+    @keyframes drift1 { from { transform: translate(0,0); } to { transform: translate(60px, 40px); } }
+    @keyframes drift2 { from { transform: translate(0,0); } to { transform: translate(-40px, -60px); } }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      background: var(--card);
+      border: 1px solid var(--input);
+      border-radius: 24px;
+      padding: 48px 40px 40px;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      animation: rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Logo row */
+    .logo-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 36px;
+    }
+    .disc img {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: block;
+    }
+    .logo-text {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+      color: var(--light);
+      letter-spacing: -0.3px;
+    }
+
+    /* State: loading */
+    #state-loading .spinner {
+      width: 48px; height: 48px;
+      border: 2px solid var(--input);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* State: success */
+    #state-success { display: none; }
+    .checkmark {
+      width: 64px; height: 64px;
+      background: linear-gradient(135deg, #1e2c1a, #162014);
+      border: 1.5px solid #3a5c34;
+      border-radius: 50%;
+      margin: 0 auto 24px;
+      display: flex; align-items: center; justify-content: center;
+      animation: pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+    }
+    @keyframes pop {
+      from { transform: scale(0.5); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+    .checkmark svg { width: 28px; height: 28px; }
+
+    /* State: error */
+    #state-error { display: none; }
+    .errormark {
+      width: 64px; height: 64px;
+      background: linear-gradient(135deg, #2c1a1a, #200f0f);
+      border: 1.5px solid #6b3333;
+      border-radius: 50%;
+      margin: 0 auto 24px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 28px;
+      font-weight: 400;
+      color: var(--light);
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+    .subtitle {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+    .subtitle strong { color: var(--light); font-weight: 500; }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.15s, transform 0.15s;
+      margin-bottom: 12px;
+    }
+    .btn:active { transform: scale(0.98); opacity: 0.85; }
+
+    .btn-primary {
+      background: var(--orange);
+      color: #fff;
+    }
+    .btn-secondary {
+      background: var(--input);
+      color: var(--light);
+    }
+
+    .footer-note {
+      margin-top: 28px;
+      font-size: 13px;
+      color: var(--dim);
+    }
+    .footer-note a { color: var(--muted); text-decoration: none; }
+    .footer-note a:hover { color: var(--light); }
+  </style>
+</head>
+<body>
+
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <div class="card">
+
+    <!-- Logo -->
+    <div class="logo-row">
+      <div class="disc"><img src="Disc.png" alt="pressplayd" /></div>
+      <span class="logo-text">pressplayd</span>
+    </div>
+
+    <!-- Loading state -->
+    <div id="state-loading">
+      <div class="spinner"></div>
+      <h1>Verifying…</h1>
+      <p class="subtitle">Just a moment while we confirm your email.</p>
+    </div>
+
+    <!-- Success state -->
+    <div id="state-success">
+      <div class="checkmark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#4caf6e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      </div>
+      <h1>You're verified!</h1>
+      <p class="subtitle">Your email has been confirmed. Open the app to start logging everything you love.</p>
+      <a id="open-app-btn" href="pressplayd://" class="btn btn-primary">Open pressplayd</a>
+      <p class="footer-note">
+        Don't have the app yet?
+        <a href="https://apps.apple.com/app/pressplayd/id123456789" target="_blank">Download on the App Store</a>
+      </p>
+    </div>
+
+    <!-- Error state -->
+    <div id="state-error">
+      <div class="errormark">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#e87d7d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </div>
+      <h1>Link expired</h1>
+      <p class="subtitle">This confirmation link has expired or already been used. <strong>Sign in to the app</strong> — if your email isn't confirmed yet, you can request a new link.</p>
+      <a href="pressplayd://" class="btn btn-primary">Open pressplayd</a>
+      <p class="footer-note">Still having trouble? <a href="mailto:hello@pressplayd.com">Contact support</a></p>
+    </div>
+
+  </div>
+
+  <script>
+    // Supabase sends tokens in the URL hash as:
+    // #access_token=...&refresh_token=...&type=signup
+    // OR as a query param for PKCE flow: ?token_hash=...&type=email
+
+    const SUPABASE_URL = 'https://dmhimmuvctozrvayfpfs.supabase.co';
+
+    function show(id) {
+      document.getElementById('state-loading').style.display = 'none';
+      document.getElementById('state-success').style.display = 'none';
+      document.getElementById('state-error').style.display  = 'none';
+      document.getElementById(id).style.display = 'block';
+    }
+
+    async function verify() {
+      const hash   = window.location.hash.substring(1);
+      const search = window.location.search.substring(1);
+      const params = new URLSearchParams(hash || search);
+
+      const accessToken  = params.get('access_token');
+      const refreshToken = params.get('refresh_token');
+      const tokenHash    = params.get('token_hash');
+      const type         = params.get('type');  // 'signup' | 'email' | 'recovery'
+
+      // ── OTP / token_hash flow (Supabase PKCE / OTP links) ──────────────
+      if (tokenHash && type) {
+        try {
+          const res = await fetch(`${SUPABASE_URL}/auth/v1/verify`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', apikey: 'sb_publishable_kgZO7sCjGwYkrscnYvtjwQ_3lFJqpGo' },
+            body: JSON.stringify({ token_hash: tokenHash, type })
+          });
+          if (res.ok) { show('state-success'); return; }
+        } catch (_) {}
+        show('state-error');
+        return;
+      }
+
+      // ── Legacy implicit flow (access_token in hash) ─────────────────────
+      if (accessToken) {
+        // Token presence means Supabase already verified it server-side; just show success
+        show('state-success');
+
+        // Optionally deep-link with the tokens so the app can auto-sign-in
+        const deepLink = `pressplayd://auth/callback#access_token=${accessToken}&refresh_token=${refreshToken}&type=${type}`;
+        document.getElementById('open-app-btn').href = deepLink;
+        return;
+      }
+
+      // Nothing useful in the URL
+      show('state-error');
+    }
+
+    verify();
+  </script>
+
+</body>
+</html>
